@@ -12,11 +12,11 @@ message(STATUS "OpenCV version: ${OpenCV_VERSION}")
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Create the library
-add_library(head_pose_estimation SHARED head_pose_estimation.cpp)
+add_library(head_pose_estimation SHARED src/head_pose_estimation.cpp)
 target_link_libraries(head_pose_estimation dlib ${OpenCV_LIBRARIES})
 
 # Create the executable binary
-add_executable(head_detection head_detection.cpp)
+add_executable(head_detection src/head_detection.cpp)
 target_link_libraries(head_detection head_pose_estimation ${OpenCV_LIBRARIES})
 
 

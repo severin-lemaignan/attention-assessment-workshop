@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 {
     if(argc < 2) {
         cerr << "Usage: " << endl <<
-                "head_detection model.dat (eg: head_detection ../../share/shape_predictor_68_face_landmarks.dat)" << endl;
+                "head_detection model.dat (eg: head_detection ../share/shape_predictor_68_face_landmarks.dat)" << endl;
         return 1;
     }
 

@@ -12,11 +12,11 @@ message(STATUS "OpenCV version: ${OpenCV_VERSION}")
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Create the library
-add_library(head_pose_estimation SHARED head_pose_estimation.cpp)
+add_library(head_pose_estimation SHARED src/head_pose_estimation.cpp)
 target_link_libraries(head_pose_estimation dlib ${OpenCV_LIBRARIES})
 
 # Create the executable binary
-add_executable(head_detection head_detection.cpp)
+add_executable(head_detection src/head_detection.cpp)
 target_link_libraries(head_detection head_pose_estimation ${OpenCV_LIBRARIES})
 
 ##### ROS ######
@@ -40,7 +40,7 @@ catkin_package(
     LIBRARIES 
 )
 
-add_executable(head_pose_estimator ros_node.cpp)
+add_executable(head_pose_estimator src/ros_node.cpp)
 target_link_libraries(head_pose_estimator head_pose_estimation ${catkin_LIBRARIES})
 
 install(TARGETS head_pose_estimation head_pose_estimator
@@ -50,7 +50,7 @@ install(TARGETS head_pose_estimation head_pose_estimator
 
 install(FILES
     launch/attention_assessment.launch
-    ../share/shape_predictor_68_face_landmarks.dat
+    share/shape_predictor_68_face_landmarks.dat
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
