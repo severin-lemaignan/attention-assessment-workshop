@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>attention_assessment</name>
+  <version>0.1.0</version>
+  <description>Assess in real time the user's attention focus</description>
+
+  <maintainer email="severin.lemaignan@epfl.ch">Séverin Lemaignan</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>image_geometry</build_depend>
+
+  <run_depend>tf</run_depend>
+
+</package>
