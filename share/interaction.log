@@ -1,0 +1,16 @@
+2015-01-22 17:49:00 - interaction_manager - INFO - Starting activity WAITING_FOR_WORD
+2015-01-22 17:49:01 - interaction_manager - INFO - Starting activity WORD_RECEIVED
+2015-01-22 17:49:02 - interaction_manager - INFO - Starting activity FEEDBACK_ON_WORD
+2015-01-22 17:49:03 - interaction_manager - INFO - Starting activity WRITING
+2015-01-22 17:49:13 - interaction_manager - INFO - Starting activity PROMPTING_FOR_DEMONSTRATION
+2015-01-22 17:49:14 - interaction_manager - INFO - Starting activity WAITING_FOR_DEMONSTRATION
+2015-01-22 17:49:34 - interaction_manager - INFO - DEMONSTRATION_RECEIVED
+2015-01-22 17:49:35 - interaction_manager - INFO - Starting activity FEEDBACK_ON_DEMONSTRATION
+2015-01-22 17:49:41 - interaction_manager - INFO - Starting activity WRITING
+2015-01-22 17:49:48 - interaction_manager - INFO - Starting activity PROMPTING_FOR_DEMONSTRATION
+2015-01-22 17:49:50 - interaction_manager - INFO - Starting activity WAITING_FOR_DEMONSTRATION
+2015-01-22 17:50:10 - interaction_manager - INFO - DEMONSTRATION_RECEIVED
+2015-01-22 17:50:11 - interaction_manager - INFO - Starting activity FEEDBACK_ON_DEMONSTRATION
+2015-01-22 17:50:12 - interaction_manager - INFO - Starting activity WRITING
+2015-01-22 17:50:21 - interaction_manager - INFO - Starting activity PROMPTING_FOR_DEMONSTRATION
+2015-01-22 17:50:22 - interaction_manager - INFO - Starting activity WAITING_FOR_DEMONSTRATION
