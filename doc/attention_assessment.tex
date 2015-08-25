@@ -190,30 +190,27 @@ cv::Matx44d HeadPoseEstimation::pose(size_t face_idx)
 {
 
     // Very simple projection matrix: we hardcode the focal length
-    // to a reasonable value for webcam and the optical center is
-    // simply the center of a 800x600 px image.
-    // You can improve that if you have time!
+    // to a reasonable value for webcams and the optical center is
+    // simply the center of a 640x480px image.
     cv::Mat projectionMat = cv::Mat::zeros(3,3,CV_32F);
     cv::Matx33f projection = projectionMat;
     projection(0,0) = 500; // focal length (x)
     projection(1,1) = 500; // focal length (y)
-    projection(0,2) = 400; // optical center (x)
-    projection(1,2) = 300; // optical center (y)
+    projection(0,2) = 320; // optical center (x)
+    projection(1,2) = 240; // optical center (y)
     projection(2,2) = 1;
 
     std::vector<Point3f> head_points_3d;
 
-    // TODO!
+    // TODO: fill the vector
 
     std::vector<Point2f> head_points_2d;
 
-    // TODO!
+    // TODO: fill the vector
 
     Mat rvec, tvec;
 
-    // call solvePnP to find the 3D pose of our head
-
-    // TODO!
+    // TODO: call solvePnP to find the 3D pose of our head
 
     // transforms the rotation vector rvec into a rotation matrix
     Matx33d rotation;

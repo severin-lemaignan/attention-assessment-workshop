@@ -24,8 +24,8 @@ int main(int argc, char **argv)
 
     // Configure the video capture
     VideoCapture video_in(0);
-    video_in.set(CV_CAP_PROP_FRAME_WIDTH, 800);
-    video_in.set(CV_CAP_PROP_FRAME_HEIGHT, 600);
+    video_in.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+    video_in.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 
     if(!video_in.isOpened()) {
         cerr << "Couldn't open camera" << endl;
