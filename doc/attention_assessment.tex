@@ -18,7 +18,7 @@ problems (why is this human staring at me since 20 minutes?)
 With a regular camera, a bit of math and a good face detector, we can actually
 estimate pretty accurately and in real-time the 3D head pose of surrounding
 humans. Combined with some frames' magic, this lets us assess what the human is
-looking at.
+looking at: his/her \emph{Visual Focus of Attention} or VFOA.
 
 }
 
@@ -26,16 +26,17 @@ looking at.
 During the workshop, we will:
 
 \begin{itemize}
-    \item use a state-of-art open-source face detector (coming for the dlib library) and
+    \item use a state-of-art open-source face detector (coming for the {\tt
+        dlib} library) and
   a PnP algorithm (from OpenCV) to match a 3D template of a head onto a 2D
   camera stream,
-  \item export the head pose as a ROS tf frame and see you face in RViz,
+  \item export the head pose as a ROS tf frame and visualize the face in RViz,
   \item write a dedicated ROS node that computes what is seen by the human at a given
   time,
   \item test the system in a pre-recorded scenario,
-  \item validate the approach by manually annotating the
-  focus of attention and computing an inter-judge agreement between the robot
-  and you (if time permits!).
+%  \item validate the approach by manually annotating the
+%  focus of attention and computing an inter-judge agreement between the robot
+%  and you (if time permits!).
 \end{itemize}
 }
 
@@ -49,24 +50,20 @@ We will first make sure everything works well on your computer: {\tt dlib}, {\tt
 opencv}, your compiler,... 
 
 \note{This assumes, of course, that you have downloaded and
-installed all the workshop's prerequisites, as you were told! Otherwise, head to
+installed all the workshop's prerequisites. Otherwise, head to
 \url{https://hrisummerschool15.wordpress.com/summer-school-programme/workshops/}
-to get the list of prerequisites and quickly installed them!
+to get the list of prerequisites and quickly install them.
 }
 
-\important{
-    To compile the code, we will make use of {\tt cmake}. Make sure it is installed! On
-    Ubuntu, {\tt apt-get install cmake} will do.
-}
+Go to \repo{} and download the repo as a zip file or clone it with {\tt git}.
+Extract the content somewhere: this will be our \sh{$PROJECT_ROOT} directory.
 
-Go to \repo{} and download the source for the workshop (or clone the repo with
-{\tt git}).
-
-Then copy the content of {\tt templates/intro/} to the root directory (\sh{$PROJECT_ROOT}):
+Then recursively copy the content of {\tt templates/intro/} to the root
+directory (\sh{$PROJECT_ROOT}):
 
 \begin{shcode}
 $ cd $PROJECT_ROOT
-$ cp templates/intro/* .
+$ cp -R templates/intro/* .
 \end{shcode}
 
 Copy as well {\tt dlib}'s face model (called {\tt
@@ -86,7 +83,11 @@ $ make
 If everything is installed correctly on your system, this should compile without
 error, and generate a binary called {\tt head\_detection}.
 
-Run it by passing the {\tt dlib}'s trained face classifier as argument that you
+\note{If the linking fails with an error related to {\tt dlib}, open
+    \sh{$DLIB_PATH/dlib/CMakeLists.txt} and add {\tt add\_definitions(-fPIC)}
+    around line 20. Then, recompile.}
+
+Run it by passing as argument the {\tt dlib}'s trained face model that you
 copied in {\tt share/}. For instance:
 
 \begin{shcode}
@@ -95,6 +96,7 @@ $ ./head_detection ../share/shape_predictor_68_face_landmarks.dat
 
 This should display the video stream of your webcam and, for each detected face,
 the contours of the face and the IDs of the 68 features recognized by the model.
+This is very similar to the face detection example that comes with {\tt dlib}.
 
 As you may have seen, this code is organized into a library ({\tt
 libhead\_pose\_estimation.so}) and a small executable linked to this library.
@@ -104,28 +106,42 @@ executables and ROS nodes simple and small.
 
 \part{From a 2D face to 3D head pose estimation}
 
-To estimate the head pose, we need to fit the 3D model of a "standard" head to the
+To estimate the head pose, we need to fit the 3D model of a reference head to the
 2D face(s) on video stream:
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.3\linewidth]{figs/face-3d}
+    \caption{Fitting a 3D model onto a 2D face}
+    \label{}
+\end{figure}
 
 Once this is achieved, the translation and rotation of the 3D model (a
 $4\times4$ transformation matrix) gives us an estimate of the real head pose of
-the person relative to the camera.
+the person \emph{relative to the camera}.
 
 We actually do not need to fit (\emph{back-project}) many points of the 3D model
 onto the 2D image to compute this transformation. Theoretically, 3 points are
 enough. To make it more robust, we can however fit more points.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figs/2d-3d}
+    \caption{Establishing 2D-3D correspondances}
+    \label{2d-3d}
+\end{figure}
+
 The \emph{fitting} operation is performed with the \emph{PnP} algorithm: it
 takes 2D-3D correspondances (pairs of points: one on the 3D model and the
-corresponding one in 2D) and iteratively computes the transformation that would
+corresponding one in 2D, figure~\ref{2d-3d}) and iteratively computes the transformation that would
 project the 3D points onto the corresponding 2D points.
+
 
 
 \step{Choosing good correspondances}
 
 The first step is to choose good pairs of 2D-3D points. Select 6 to 8 2D points
-(take their IDs from Figure~\ref{dlib-features}), and store the corresponding 3D
+(take their IDs from figure~\ref{dlib-features}), and store the corresponding 3D
 coordinates.
 
 \begin{figure}[h!]
@@ -136,14 +152,15 @@ coordinates.
 \end{figure}
 
 To find the 3D coordinates, decide of an origin on the face (for instance, the
-nose), and compute the position of the points relative to the nose. You can get
-the anthropometry of an average head from the figure~\ref{head}, that comes from
-this wikipedia page: \url{https://en.wikipedia.org/wiki/Human_head}.
+nose, or possibly better, the \emph{sellion} which lays between the two eyes),
+and compute the position of the points relative to the nose. You can get the
+anthropometry of an average adult head from figure~\ref{head} (that comes from
+this wikipedia page: \url{https://en.wikipedia.org/wiki/Human_head}).
 
-\begin{figure}
+\begin{figure}[h!]
     \centering
     \includegraphics[width=1.\linewidth]{figs/headanthropometry}
-    \caption{Static adult human physical characteristics of the head.}
+    \caption{Adult human physical characteristics of the head.}
     \label{head}
 \end{figure}
 
@@ -161,7 +178,7 @@ enum FACIAL_FEATURE {
     // Complete that!
 };
 
-// 3D coordinates of these points
+// 3D coordinates of these points, assuming here that the nose is the origin
 const static cv::Point3f NOSE_3D(0., 0., 0.);
 const static cv::Point3f RIGHT_EYE_3D(-41., -65.5, 43.);
 // Complete that!
@@ -180,7 +197,8 @@ To call it, you need to pass:
     \item and a projection matrix
 \end{itemize}
 
-Create a new method \cpp{cv::Matx44d HeadPoseEstimation::pose(size_t face_idx)} that takes
+Using the code provided below, modify {\tt src/head\_pose\_estimation.cpp} to
+create a new method \\ \cpp{cv::Matx44d HeadPoseEstimation::pose(size_t face_idx)} that takes
 the index of one of the detected faces, call \cpp{cv::solvePnP} from it, and
 finally returns the transformation:
 
@@ -239,7 +257,7 @@ Point2f HeadPoseEstimation::coordsOf(size_t face_idx, FACIAL_FEATURE feature)
 
 \step{Display the head pose}
 
-Using the following code, overlay the 3 unit vectors X, Y, Z on top of the face
+Using the provided code, overlay the 3 unit vectors X, Y, Z on top of the face
 to show the 3D head pose.
 
 \begin{cppcode}
@@ -255,7 +273,7 @@ std::vector<Point2f> projected_axes;
 // Use here the rvec and tvec returned by solvePnP
 projectPoints(axes, rvec, tvec, projection, noArray(), projected_axes);
 
-// displays the vectors as well as the textual coordinates
+// displays the vectors as well as the coordinates
 line(_debug, projected_axes[0], projected_axes[3], Scalar(255,0,0),2,CV_AA);
 line(_debug, projected_axes[0], projected_axes[2], Scalar(0,255,0),2,CV_AA);
 line(_debug, projected_axes[0], projected_axes[1], Scalar(0,0,255),2,CV_AA);
@@ -263,8 +281,8 @@ line(_debug, projected_axes[0], projected_axes[1], Scalar(0,0,255),2,CV_AA);
 putText(_debug, "(" + to_string(int(pose(0,3) * 100)) + "cm, " 
                     + to_string(int(pose(1,3) * 100)) + "cm, " 
                     + to_string(int(pose(2,3) * 100)) + "cm)", 
-        coordsOf(face_idx, SELLION), 
-        FONT_HERSHEY_DUPLEX, 0.5, Scalar(255,255,255),2);
+        coordsOf(face_idx, NOSE), 
+        FONT_HERSHEY_DUPLEX, 0.5, Scalar(0,0,255),2);
 
 \end{cppcode}
 
@@ -280,7 +298,7 @@ Modify {\tt head\_detection.cpp} to call \cpp{HeadPoseEstimation::pose}.
 
 You should now obtain something similar to figure~\ref{head_pose}. We have
 estimated in real-time the 6D pose of the head using a monocular camera,
-about 100 lines of code, and this even works with multiple persons at the same
+in about 100 lines of code, and this even works with multiple persons at the same
 time. Not bad!
 
 \part{Field of attention}
@@ -297,7 +315,7 @@ them, and \textbf{install} them.
 $ cd $PROJECT_ROOT
 $ cp -R templates/part2/* .
 $ cd build
-$ make install
+$ make && make install
 \end{shcode}
 
 If ROS is correctly set-up on your system, you should be able to launch the {\tt
@@ -372,15 +390,15 @@ The next step consists in computing the field of view ({\it FoV}) and field of
 attention ({\it FoA}) of the person. We model them as cones spanning from the
 head's origin.
 
-\important{This is a simplified model: obviously, one may move his/her eyes --
+\important{This is a simplified model: obviously, one may move his/her eye balls --
     hence rotating the field of view -- without moving the head. However, this
     approximation work well enough in many situation. For a more accurate
     measurement of the direction of the field of view, one may resort to
     eye-tracking techniques.  }
 
 \note{From now on, we will only consider the {\bf first} detected person,
-    corresponding to the frame {\tt face\_0}. Making the next step compatible
-    with multiple people is left as an exercise to the reader :-)}
+    corresponding to the frame {\tt face\_0}. Support for multiple people is
+    left as an exercise to the reader :-)}
 
 A convenient way to represent the fields of view and fields of attention in RViz
 is to simulate a range sensor, which is displayed in RViz as a cone.
@@ -411,13 +429,13 @@ foa_pub = rosNode.advertise<sensor_msgs::Range>("face_0_field_of_attention", 1);
 // the Range messages are actually almost constant! We can define them in the
 // constructor.
 fov.radiation_type = sensor_msgs::Range::INFRARED;
-fov.field_of_view = FOV;
+fov.field_of_view = 50. / 180 * M_PI; // radians
 fov.min_range = 0;
 fov.max_range = 10;
 fov.range = 0.5; // meters
 
 foa.radiation_type = sensor_msgs::Range::INFRARED;
-foa.field_of_view = FOA;
+foa.field_of_view = 15. / 180 * M_PI; // radians
 foa.min_range = 0;
 foa.max_range = 10;
 foa.range = 1; // meters
@@ -460,7 +478,7 @@ launch file, so start it by simply calling:
 $ roslaunch attention_assessment attention_assessment.launch
 \end{shcode}
 
-It does not do anything for now: modify it to publish on the topic {\tt
+It does not do anything useful for now: complete it to publish on the topic {\tt
 current\_focus} the list of {\it tf} frames that are currently in field of
 attention of the person.
 
@@ -507,7 +525,7 @@ interaction. Depending on the phase of the interaction, the child would have to
 look either to the robot, to one of the tablets, or to the experimenter. The
 different possible focuses are depicted in red.
 
-\begin{figure}
+\begin{figure} [h!]
     \centering
     \includegraphics[width=0.7\linewidth]{figs/cowriter_setup}
     \caption{Typical child-robot face-to-face interaction. In red, the different
@@ -545,7 +563,7 @@ frames:
 Test that the focus tracking and plotting works well with this more complex
 environment.
 
-Then, download the video from \url{http://goo.gl/wLtvM1}, and modify the {\tt gscam}
+Then, download the video from \url{http://goo.gl/KmA2Qn} (4.4MB), and modify the {\tt gscam}
 invokation in the launch file to open it instead of the webcam:
 
 \begin{xmlcode}
