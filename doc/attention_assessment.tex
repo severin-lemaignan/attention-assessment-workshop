@@ -308,7 +308,7 @@ time. Not bad!
 The first step of the second part is to ``ROSify'' the head pose estimation: in
 our case, it means publishing the head pose as a {\it tf} frame.
 
-Start by copying the templates from {\tt templates/part2} to {\tt src/}, compile
+Start by copying the templates from {\tt templates/part2} to \sh{$PROJECT_ROOT}, compile
 them, and \textbf{install} them.
 
 \begin{shcode}
@@ -579,7 +579,7 @@ tracked, either modify {\tt head\_detection.cpp} to open the vide instead of the
 webcam, or modify the head pose estimation library to display the image. For
 instance, adding
 \cpp{imshow("headdetection", _debug);waitKey(10);} at the end of
-\cpp{HeadPoseEstimation::update} in {\tt head\_pose\_estimation.cpp} will do.}
+\cpp{HeadPoseEstimation::pose} in {\tt head\_pose\_estimation.cpp} will do.}
 
 \step{Expected focus of attention}
 
